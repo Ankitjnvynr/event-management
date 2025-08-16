@@ -1,11 +1,12 @@
-import Index from '@/component/Index'
 import React from 'react'
+
+import CalendarApp from '../component/CalendarApp'
+
 
 const page = () => {
   return (
     <>
-
-    <Index/>
+      <CalendarApp />
     </>
   )
 }

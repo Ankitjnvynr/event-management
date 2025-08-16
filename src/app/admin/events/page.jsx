@@ -1,10 +1,11 @@
-import Index from '../../component/Index'
+import { AdminEventsPage } from '../../../component/admin'
 import React from 'react'
 
 const page = () => {
   return (
     <>
-        <Index />
+    <AdminEventsPage />
+    
     </>
   )
 }

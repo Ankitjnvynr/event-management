@@ -1,11 +1,8 @@
-import Index from '../../component/Index'
 import React from 'react'
 
 const page = () => {
   return (
-    <>
-        <Index />
-    </>
+    <div>page</div>
   )
 }
 
