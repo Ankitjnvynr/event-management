@@ -20,7 +20,8 @@ const Layout = ({ children }) => {
             const hasToken = localStorage.getItem("accessToken") || document.cookie.split(';').some((item) => item.trim().startsWith('token='));
 
             
-            if (!hasToken) {
+            if (!hasToken || hasToken==null || hasToken=='undefined') {
+                localStorage.clear()
                 router.push("/login");
                 setIsLoading(true);    
             }else{

@@ -201,7 +201,7 @@ export default function AdminEventsPage() {
                             <div className="flex gap-4 flex-wrap">
                                 <div className="max-w-70 rounded">
                                     <img className="w-full rounded-xl" src={event.featured_image || 'https://images.unsplash.com/photo-1753001662072-8ad5f40f34fc?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'} alt={event.title} />
-                                    
+                                     
                                 </div>
                                 <div className="flex-1  ">
                                     {/* Title + Status */}

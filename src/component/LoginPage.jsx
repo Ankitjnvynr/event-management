@@ -39,11 +39,12 @@ const LoginPage = () => {
                 // Set token in cookies or local storage
                 localStorage.setItem("accessToken", data.access_token);
                 localStorage.setItem("refreshToken", data.refresh_token);
+                // const user = JSON.stringify()
+                localStorage.setItem("user",JSON.stringify(data.user))
                 // console.log(data.user)
 
                 // Redirect or update state as needed
                 router.push('/admin'); 
-                setIsLoading(false);
             } else {
                 console.error('Login failed:', response.statusText);
                 setError('Login failed. Please check your credentials.');
