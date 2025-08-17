@@ -3,9 +3,13 @@
 import { useState, useEffect } from "react"
 import Pagination from "../utils/Pagination"
 import { config } from "../../conf/config"
-import { FaEdit, FaTrashAlt } from "react-icons/fa" // Importing React Icons
+import { FaEdit, FaPhoneAlt, FaTrashAlt } from "react-icons/fa" // Importing React Icons
+import { IoMdMail } from "react-icons/io";
+import { RiGlobalFill } from "react-icons/ri";
 
 export default function AdminEventsPage() {
+    
+
     const [events, setEvents] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState(null)
@@ -16,6 +20,7 @@ export default function AdminEventsPage() {
         start_date: "",
         end_date: "",
     })
+
     const [pagination, setPagination] = useState({
         page: 1,
         limit: 10,
@@ -42,8 +47,9 @@ export default function AdminEventsPage() {
                 limit: pagination.limit,
                 ...filters,
             })
-
-            const res = await fetch(`${config.apiBaseUrl}/event?${params.toString()}`, {
+            const finalUrl = `${config.apiBaseUrl}/event?${params.toString()}`
+            console.log(finalUrl)
+            const res = await fetch(finalUrl, {
                 headers: {
                     "Content-type": "application/json",
                     "Authorization": `Bearer ${localStorage.getItem('accessToken')}`
@@ -113,6 +119,7 @@ export default function AdminEventsPage() {
     const handleFilterChange = (e) => {
         const { name, value } = e.target
         setFilters((prev) => ({ ...prev, [name]: value }))
+        setPagination((prev)=>({...prev,page:1}))
     }
 
     const handleUpdateChange = (e) => {
@@ -124,20 +131,16 @@ export default function AdminEventsPage() {
     };
 
     return (
-        <div className="p-6 bg-gray-100 min-h-screen">
-            <h1 className="text-3xl font-extrabold text-gray-800 mb-8 text-center" onClick={fetchEvents}>
-                Admin Events Management
-            </h1>
-
+        <div className="min-h-screen">
             {/* Filters */}
-            <div className="bg-white p-6 rounded-2xl shadow-lg mb-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
+            <div className="bg-white rounded-2xl mb-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-5">
                 <input
                     type="text"
                     name="title"
                     placeholder="Filter by Title"
                     value={filters.title}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
+                    className="border border-gray-300 rounded-lg px-4 py-1 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
                 />
                 <input
                     type="text"
@@ -145,13 +148,13 @@ export default function AdminEventsPage() {
                     placeholder="Organizer"
                     value={filters.organizer_name}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
+                    className="border border-gray-300 rounded-lg px-4 py-1 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
                 />
                 <select
                     name="is_approved"
                     value={filters.is_approved}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none bg-white pr-8 transition duration-200 ease-in-out"
+                    className="border border-gray-300 rounded-lg px-4 py-1 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent appearance-none bg-white pr-8 transition duration-200 ease-in-out"
                 >
                     <option value="">All Statuses</option>
                     <option value="true">Approved</option>
@@ -162,14 +165,14 @@ export default function AdminEventsPage() {
                     name="start_date"
                     value={filters.start_date}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
+                    className="border border-gray-300 rounded-lg px-4 py-1 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
                 />
                 <input
                     type="date"
                     name="end_date"
                     value={filters.end_date}
                     onChange={handleFilterChange}
-                    className="border border-gray-300 rounded-lg px-4 py-2 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
+                    className="border border-gray-300 rounded-lg px-4 py-1 w-full focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition duration-200 ease-in-out"
                 />
             </div>
 
@@ -187,64 +190,129 @@ export default function AdminEventsPage() {
                 <p className="text-center py-10 text-gray-600 text-lg">No events found based on your filters. 🧐</p>
             )}
 
-            {/* Events Table */}
+            {/* Events in Card Layout */}
             {!loading && events.length > 0 && (
-                <div className="overflow-x-auto bg-white rounded-2xl shadow-lg">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Title</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Organizer</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
-                                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Approved</th>
-                                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {events.map((event) => (
-                                <tr key={event.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{event.title}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{event.organizer_name}</td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                        {new Date(event.start_time).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        {event.is_approved ? (
-                                            <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                                Yes
-                                            </span>
-                                        ) : (
-                                            <span className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                                                No
-                                            </span>
-                                        )}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                        <button
-                                            onClick={() => {
-                                                setEventToUpdate(event)
-                                                setShowUpdateModal(true)
-                                            }}
-                                            className="text-indigo-600 hover:text-indigo-900 mx-2 transition duration-150 ease-in-out transform hover:scale-110"
-                                            title="Edit Event"
-                                        >
-                                            <FaEdit size={20} />
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setEventToDelete(event)
-                                                setShowDeleteModal(true)
-                                            }}
-                                            className="text-red-600 hover:text-red-900 mx-2 transition duration-150 ease-in-out transform hover:scale-110"
-                                            title="Delete Event"
-                                        >
-                                            <FaTrashAlt size={20} />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <div className="space-y-6">
+                    {events.map((event) => (
+                        <div
+                            key={event.id}
+                            className="bg-gray-50 shadow-lg rounded-2xl p-2 px-4 border border-gray-100 hover:shadow-xl transition duration-300 ease-in-out"
+                        >
+                            <div className="flex gap-4 flex-wrap">
+                                <div className="max-w-70 rounded">
+                                    <img className="w-full rounded-xl" src={event.featured_image || 'https://images.unsplash.com/photo-1753001662072-8ad5f40f34fc?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'} alt={event.title} />
+                                    
+                                </div>
+                                <div className="flex-1  ">
+                                    {/* Title + Status */}
+                                    <div className="flex  flex-1 md:flex-row   md:justify-between mb-0">
+                                        <h3 className="text-2xl font-bold text-gray-800">{event.title}</h3>
+                                        <div>
+                                            <span
+                                                className={`px-4 py-1 mt-2 md:mt-0 inline-flex text-sm font-semibold rounded-full ${event.is_approved
+                                                    ? "bg-green-100 text-green-800"
+                                                    : "bg-red-100 text-red-800"
+                                                    }`}
+                                            >
+                                                {event.is_approved ? "Approved" : "Not Approved"}
+                                            </span></div>
+                                    </div>
+                                    {/* Description */}
+                                    {event.description && (
+                                        <div className="mt-0">
+                                            <p className="text-gray-600 text-sm leading-relaxed">{event.description}</p>
+                                        </div>
+                                    )}
+                                    <div className="font-bold text-[18px]">
+                                        <span className="text-green-600">from</span>
+                                        {" "}
+                                        {event.start_time
+                                            ? new Date(event.start_time).toLocaleDateString("en-GB", {
+                                                day: "numeric",
+                                                month: "short",
+                                                year: "numeric",
+                                            }) +
+                                            " " +
+                                            new Date(event.start_time).toLocaleTimeString("en-GB", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: true
+                                            })
+                                            : "N/A"}{" "}
+                                        <span className="text-green-600">to</span>{" "}
+                                        {event.end_time
+                                            ? new Date(event.end_time).toLocaleDateString("en-GB", {
+                                                day: "numeric",
+                                                month: "short",
+                                                year: "numeric",
+                                            }) +
+                                            " " +
+                                            new Date(event.end_time).toLocaleTimeString("en-GB", {
+                                                hour: "2-digit",
+                                                minute: "2-digit",
+                                                hour12: true
+                                            })
+                                            : "N/A"}
+                                    </div>
+
+                                    <div > <span className="font-semibold"> Organizer:</span>{event.organizer_name}</div>
+                                    <div > <span className="font-semibold"> Location:</span>{event.location}</div>
+                                    <div className="flex flex-wrap items-center gap-6 text-gray-700 text-sm">
+                                        <span className="flex items-center gap-2">
+                                            <FaPhoneAlt className="text-indigo-600" />
+                                            {event.contact_phone || "N/A"}
+                                        </span>
+
+                                        <span className="flex items-center gap-2">
+                                            <IoMdMail className="text-indigo-600" />
+                                            {event.contact_email || "N/A"}
+                                        </span>
+
+                                        <span className="flex items-center gap-2">
+                                            <RiGlobalFill className="text-indigo-600" />
+                                            {event.website_url || "N/A"}
+                                        </span>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+
+
+
+                            {/* Actions */}
+                            <div className="mt-2 flex  justify-between">
+                                {/* Info Grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2  mt-0 text-sm text-gray-700">
+
+                                    <p><span className="font-semibold">Registration:</span> {event.registration_link || "N/A"}</p>
+                                    <p className="md:col-span-2"><span className="font-semibold">External Links:</span> {event.external_links || "N/A"}</p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => {
+                                            setEventToUpdate(event)
+                                            setShowUpdateModal(true)
+                                        }}
+                                        className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 focus:outline-none focus:ring-2 cursor-pointer focus:ring-indigo-500 transition duration-200 ease-in-out transform hover:scale-105"
+                                    >
+                                        <FaEdit />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            setEventToDelete(event)
+                                            setShowDeleteModal(true)
+                                        }}
+                                        className="flex items-center gap-2 cursor-pointer px-4 py-2 bg-red-600 text-white  hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 transition duration-200 ease-in-out transform hover:scale-105"
+                                    >
+                                        <FaTrashAlt />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
 
@@ -485,4 +553,7 @@ export default function AdminEventsPage() {
             )}
         </div>
     )
+
 }
+
+
