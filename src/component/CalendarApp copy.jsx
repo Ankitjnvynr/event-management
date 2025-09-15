@@ -36,7 +36,7 @@ const CalendarApp = () => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [submittedEvents, setSubmittedEvents] = useState([]);
   const [events, setEvents] = useState({
-    '2025-09-15': [
+    '2025-08-15': [
       { 
         id: 1, 
         title: 'Ganga Aarti Ceremony', 
