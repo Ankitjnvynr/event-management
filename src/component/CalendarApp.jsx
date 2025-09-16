@@ -1,16 +1,16 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Plus, 
-  X, 
-  Clock, 
-  MapPin, 
-  Calendar, 
-  User, 
-  Mail, 
-  Building, 
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  X,
+  Clock,
+  MapPin,
+  Calendar,
+  User,
+  Mail,
+  Building,
   FileText,
   Star,
   CheckCircle,
@@ -27,6 +27,7 @@ import {
   Target,
   Zap
 } from 'lucide-react';
+import { config } from '../conf/config';
 
 const CalendarApp = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -37,22 +38,22 @@ const CalendarApp = () => {
   const [submittedEvents, setSubmittedEvents] = useState([]);
   const [events, setEvents] = useState({
     '2025-09-15': [
-      { 
-        id: 1, 
-        title: 'Ganga Aarti Ceremony', 
-        time: '6:00 PM', 
-        location: 'Dashashwamedh Ghat, Varanasi', 
+      {
+        id: 1,
+        title: 'Ganga Aarti Ceremony',
+        time: '6:00 PM',
+        location: 'Dashashwamedh Ghat, Varanasi',
         type: 'festival',
         organizer: 'Kashi Vishwanath Temple',
         email: 'events@kashivishwanath.org',
         description: 'Sacred evening aarti ceremony at the holy Ganges river',
         image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400'
       },
-      { 
-        id: 2, 
-        title: 'Yoga & Meditation Retreat', 
-        time: '6:00 AM', 
-        location: 'Rishikesh Ashram', 
+      {
+        id: 2,
+        title: 'Yoga & Meditation Retreat',
+        time: '6:00 AM',
+        location: 'Rishikesh Ashram',
         type: 'personal',
         organizer: 'Himalayan Yoga Institute',
         email: 'retreat@himyoga.com',
@@ -61,11 +62,11 @@ const CalendarApp = () => {
       }
     ],
     '2025-08-20': [
-      { 
-        id: 3, 
-        title: 'Krishna Janmashtami Celebration', 
-        time: '11:30 PM', 
-        location: 'ISKCON Temple', 
+      {
+        id: 3,
+        title: 'Krishna Janmashtami Celebration',
+        time: '11:30 PM',
+        location: 'ISKCON Temple',
         type: 'festival',
         organizer: 'ISKCON Community',
         email: 'celebrate@iskcon.org',
@@ -74,11 +75,11 @@ const CalendarApp = () => {
       }
     ],
     '2025-08-25': [
-      { 
-        id: 4, 
-        title: 'Spiritual Discourse & Satsang', 
-        time: '4:00 PM', 
-        location: 'Community Hall', 
+      {
+        id: 4,
+        title: 'Spiritual Discourse & Satsang',
+        time: '4:00 PM',
+        location: 'Community Hall',
         type: 'cultural',
         organizer: 'Vedanta Society',
         email: 'satsang@vedanta.org',
@@ -89,28 +90,49 @@ const CalendarApp = () => {
   });
 
   const [newEvent, setNewEvent] = useState({
-    title: '',
-    time: '',
-    location: '',
-    type: 'festival',
-    name: '',
-    email: '',
-    organization: '',
-    description: '',
-    date: '',
-    image: ''
+    name: "",
+    email: "",
+    organization: "",
+    title: "",
+    start_date: "",
+    end_date: "",
+    start_time: "",
+    end_time: "",
+    location: "",
+    website_url: "",
+    registration_link: "",
+    external_links: "",
+    type: "festival",
+    description: "",
+    featured_image: null, // file
+    is_all_day: false,
   });
+
+
+  // fetching events from backend 
+  const getEvents = async () => {
+    const url = `${config.apiBaseUrl}/events`
+
+    const response = await fetch(url);
+    const resJson = await response.json()
+    console.log("data from api", resJson)
+    setEvents(resJson.data)
+  }
+
+  useEffect(() => {
+    getEvents()
+  }, [])
 
   // Hindu Calendar Data
   const getHinduCalendarEvents = (year, month, day) => {
     const date = new Date(year, month, day);
     const hinduEvents = [];
-    
+
     // Calculate lunar day (tithi) - simplified calculation
     const dayOfYear = Math.floor((date - new Date(year, 0, 0)) / (1000 * 60 * 60 * 24));
     const lunarCycle = 29.5; // Approximate lunar month
     const lunarDay = Math.floor((dayOfYear % lunarCycle) + 1);
-    
+
     // Ekadashi (11th day of lunar fortnight)
     if (lunarDay === 11 || lunarDay === 26) {
       hinduEvents.push({
@@ -119,7 +141,7 @@ const CalendarApp = () => {
         description: 'Sacred fasting day dedicated to Lord Vishnu'
       });
     }
-    
+
     // Purnima (Full Moon - 15th day)
     if (lunarDay === 15) {
       hinduEvents.push({
@@ -128,7 +150,7 @@ const CalendarApp = () => {
         description: 'Full Moon day - auspicious for prayers and meditation'
       });
     }
-    
+
     // Amavasya (New Moon - 30th day)
     if (lunarDay === 30 || lunarDay === 1) {
       hinduEvents.push({
@@ -137,7 +159,7 @@ const CalendarApp = () => {
         description: 'New Moon day - time for ancestor worship'
       });
     }
-    
+
     // Pradosh (13th day)
     if (lunarDay === 13 || lunarDay === 28) {
       hinduEvents.push({
@@ -146,7 +168,7 @@ const CalendarApp = () => {
         description: 'Sacred to Lord Shiva'
       });
     }
-    
+
     // Chaturthi (4th day - Ganesh)
     if (lunarDay === 4 || lunarDay === 19) {
       hinduEvents.push({
@@ -155,7 +177,7 @@ const CalendarApp = () => {
         description: 'Sacred to Lord Ganesha'
       });
     }
-    
+
     // Major Hindu Festivals (approximate dates)
     const monthDay = `${month + 1}-${day}`;
     const festivals = {
@@ -176,11 +198,11 @@ const CalendarApp = () => {
       '11-15': { name: 'Guru Nanak Jayanti', type: 'festival', description: 'Birth of Guru Nanak' },
       '12-25': { name: 'Christmas', type: 'festival', description: 'Birth of Jesus Christ' }
     };
-    
+
     if (festivals[monthDay]) {
       hinduEvents.push(festivals[monthDay]);
     }
-    
+
     return hinduEvents;
   };
 
@@ -219,7 +241,7 @@ const CalendarApp = () => {
     const timer1 = setTimeout(() => setAnimations(prev => ({ ...prev, headerVisible: true })), 100);
     const timer2 = setTimeout(() => setAnimations(prev => ({ ...prev, calendarVisible: true })), 300);
     const timer3 = setTimeout(() => setAnimations(prev => ({ ...prev, formVisible: true })), 600);
-    
+
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
@@ -260,36 +282,88 @@ const CalendarApp = () => {
     setShowEventModal(true);
   };
 
-  const addEvent = () => {
-    if (!newEvent.title.trim() || !newEvent.name.trim() || !newEvent.email.trim()) return;
-    
-    const eventWithId = {
-      ...newEvent,
-      id: Date.now(),
-      organizer: newEvent.organization || newEvent.name
-    };
+const addEvent = async () => {
+  if (!newEvent.title.trim() || !newEvent.name.trim() || !newEvent.email.trim()) return;
 
-    const dateKey = selectedDate || newEvent.date;
-    setEvents(prev => ({
-      ...prev,
-      [dateKey]: [...(prev[dateKey] || []), eventWithId]
-    }));
+  try {
+    const formData = new FormData();
+    formData.append("name", newEvent.name);
+    formData.append("title", newEvent.title);
+    formData.append("start_date", newEvent.start_date);
+    formData.append("end_date", newEvent.end_date);
+    formData.append("start_time", newEvent.start_date+newEvent.start_time);
+    formData.append("end_time", newEvent.end_date + newEvent.end_time);
+    formData.append("contact_email", newEvent.email);
+    formData.append("contact_phone", newEvent.phone);
+    formData.append("organization", newEvent.organization);
+    formData.append("location", newEvent.location);
+    formData.append("website_url", newEvent.website_url);
+    formData.append("registration_link", newEvent.registration_link);
+    formData.append("external_links", newEvent.external_links);
+    formData.append("type", newEvent.type);
+    formData.append("description", newEvent.description);
+    formData.append("is_all_day", newEvent.is_all_day ? "1" : "0");
+    formData.append("organizer_name", newEvent.organization || newEvent.name);
 
-    setSubmittedEvents(prev => [...prev, eventWithId]);
-    setNewEvent({ 
-      title: '', 
-      time: '', 
-      location: '', 
-      type: 'festival', 
-      name: '', 
-      email: '', 
-      organization: '', 
-      description: '', 
-      date: '',
-      image: ''
+    // handle file if provided
+    if (newEvent.featured_image) {
+      formData.append("eventImg", newEvent.featured_image);
+    }
+
+    const url = `${config.apiBaseUrl}/events`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
     });
-    setShowCreateModal(false);
-  };
+
+    const result = await response.json();
+    console.log("Event added:", result);
+
+    if (response.ok) {
+      const eventWithId = {
+        ...newEvent,
+        id: result?.id || Date.now(),
+        organizer: newEvent.organization || newEvent.name,
+      };
+
+      const dateKey = newEvent.start_date;
+      setEvents(prev => ({
+        ...prev,
+        [dateKey]: [...(prev[dateKey] || []), eventWithId],
+      }));
+
+      setSubmittedEvents(prev => [...prev, eventWithId]);
+
+      setNewEvent({
+        name: "",
+        email: "",
+        organization: "",
+        title: "",
+        start_date: "",
+        end_date: "",
+        start_time: "",
+        end_time: "",
+        location: "",
+        website_url: "",
+        registration_link: "",
+        external_links: "",
+        type: "festival",
+        description: "",
+        featured_image: null,
+        is_all_day: false,
+      });
+      setShowCreateModal(false);
+    } else {
+      console.error("Failed to add event:", result);
+    }
+  } catch (error) {
+    console.error("Error adding event:", error);
+  }
+};
+
+
+
 
   const deleteEvent = (eventId) => {
     setEvents(prev => ({
@@ -301,7 +375,7 @@ const CalendarApp = () => {
   const scrollToForm = () => {
     setIsFormVisible(true);
     setTimeout(() => {
-      document.getElementById('event-form').scrollIntoView({ 
+      document.getElementById('event-form').scrollIntoView({
         behavior: 'smooth',
         block: 'start'
       });
@@ -330,18 +404,16 @@ const CalendarApp = () => {
         <div
           key={day}
           onClick={() => handleDateClick(day)}
-          className={`h-24 p-2 border border-yellow-200/30 cursor-pointer transition-all duration-300 hover:bg-gradient-to-br hover:from-red-50/20 hover:to-yellow-50/20 hover:scale-105 hover:shadow-lg hover:shadow-red-200/50 group relative overflow-hidden ${
-            isToday ? 'bg-gradient-to-br from-red-100/30 to-yellow-100/30 ring-2 ring-yellow-400 shadow-lg' : ''
-          }`}
+          className={`h-24 p-2 border border-yellow-200/30 cursor-pointer transition-all duration-300 hover:bg-gradient-to-br hover:from-red-50/20 hover:to-yellow-50/20 hover:scale-105 hover:shadow-lg hover:shadow-red-200/50 group relative overflow-hidden ${isToday ? 'bg-gradient-to-br from-red-100/30 to-yellow-100/30 ring-2 ring-yellow-400 shadow-lg' : ''
+            }`}
         >
           <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           <div className="flex flex-col h-full relative z-10">
             <div className="flex justify-between items-center mb-1">
-              <span className={`text-sm font-bold transition-all duration-200 ${
-                isToday 
-                  ? 'text-yellow-100 text-lg' 
-                  : 'text-yellow-100 group-hover:text-white group-hover:scale-110'
-              }`}>
+              <span className={`text-sm font-bold transition-all duration-200 ${isToday
+                ? 'text-yellow-100 text-lg'
+                : 'text-yellow-100 group-hover:text-white group-hover:scale-110'
+                }`}>
                 {day}
               </span>
               {hinduEvents.length > 0 && (
@@ -359,13 +431,13 @@ const CalendarApp = () => {
                   🕉️ {hinduEvent.name}
                 </div>
               ))}
-              
+
               {/* Regular Events */}
               {dayEvents.slice(0, hinduEvents.length > 0 ? 1 : 2).map((event, idx) => (
                 <div
                   key={event.id}
                   className={`text-xs px-2 py-1 rounded-full mb-1 text-white truncate transform transition-all duration-200 hover:scale-105 ${getEventTypeColor(event.type)} shadow-sm`}
-                  style={{ 
+                  style={{
                     animationDelay: `${(idx + hinduEvents.length) * 100}ms`,
                     animation: 'fadeInUp 0.3s ease-out forwards'
                   }}
@@ -373,7 +445,7 @@ const CalendarApp = () => {
                   {event.title}
                 </div>
               ))}
-              
+
               {/* Show total count if more events */}
               {(dayEvents.length + hinduEvents.length) > 2 && (
                 <div className="text-xs text-yellow-200 font-medium animate-pulse">
@@ -417,7 +489,7 @@ const CalendarApp = () => {
               <a href="#sponsors" className="hover:text-yellow-100 transition-colors duration-200 hover:underline">Sponsors</a>
               <a href="#contact" className="hover:text-yellow-100 transition-colors duration-200 hover:underline">Contact</a>
             </div>
-            <button 
+            <button
               onClick={scrollToForm}
               className="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-6 py-2 rounded-full hover:shadow-lg hover:shadow-red-500/25 transition-all duration-300 hover:scale-105 flex items-center gap-2"
             >
@@ -435,11 +507,11 @@ const CalendarApp = () => {
               🕉️ Sacred Events Calendar
             </h1>
             <p className="text-xl text-yellow-100/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Discover and celebrate spiritual events with our sacred calendar featuring Hindu traditions, festivals, 
+              Discover and celebrate spiritual events with our sacred calendar featuring Hindu traditions, festivals,
               and divine observances. Connect with your spiritual community.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
+              <button
                 onClick={scrollToForm}
                 className="bg-gradient-to-r from-yellow-500 to-red-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl hover:shadow-red-500/25 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-3"
               >
@@ -509,7 +581,7 @@ const CalendarApp = () => {
                   </div>
                 ))}
               </div>
-              
+
               {/* Calendar Days */}
               <div className="grid grid-cols-7 bg-red-900/10">
                 {renderCalendarDays()}
@@ -531,32 +603,32 @@ const CalendarApp = () => {
 
               <div className="grid md:grid-cols-3 gap-6">
                 {[
-                  { 
+                  {
                     image: 'https://images.unsplash.com/photo-1582510003544-4d00b7f74220?w=400',
                     title: 'Ganga Aarti',
                     description: 'Evening prayers at the holy Ganges'
                   },
-                  { 
+                  {
                     image: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=400',
                     title: 'Krishna Janmashtami',
                     description: 'Celebrating Lord Krishna\'s birth'
                   },
-                  { 
+                  {
                     image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68e71?w=400',
                     title: 'Yoga & Meditation',
                     description: 'Morning spiritual practices'
                   },
-                  { 
+                  {
                     image: 'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=400',
                     title: 'Spiritual Discourse',
                     description: 'Community satsang gathering'
                   },
-                  { 
+                  {
                     image: 'https://images.unsplash.com/photo-1544949343-4a80e019f52f?w=400',
                     title: 'Temple Festival',
                     description: 'Traditional temple celebration'
                   },
-                  { 
+                  {
                     image: 'https://images.unsplash.com/photo-1514497730914-2e4b7b2a96fc?w=400',
                     title: 'Diwali Celebration',
                     description: 'Festival of lights ceremony'
@@ -668,7 +740,7 @@ const CalendarApp = () => {
                   🕉️ Submit Sacred Event
                 </h2>
                 <p className="text-yellow-100/70 text-lg max-w-2xl mx-auto">
-                  Share your spiritual event with our divine community. Include festivals, celebrations, 
+                  Share your spiritual event with our divine community. Include festivals, celebrations,
                   and sacred gatherings to help others connect with Hindu traditions.
                 </p>
               </div>
@@ -683,12 +755,12 @@ const CalendarApp = () => {
                     <input
                       type="text"
                       value={newEvent.name}
-                      onChange={(e) => setNewEvent({...newEvent, name: e.target.value})}
+                      onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
                       className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                       placeholder="Enter your full name"
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
                       <Mail className="w-4 h-4" />
@@ -697,7 +769,7 @@ const CalendarApp = () => {
                     <input
                       type="email"
                       value={newEvent.email}
-                      onChange={(e) => setNewEvent({...newEvent, email: e.target.value})}
+                      onChange={(e) => setNewEvent({ ...newEvent, email: e.target.value })}
                       className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                       placeholder="your.email@example.com"
                     />
@@ -713,21 +785,33 @@ const CalendarApp = () => {
                     <input
                       type="text"
                       value={newEvent.organization}
-                      onChange={(e) => setNewEvent({...newEvent, organization: e.target.value})}
+                      onChange={(e) => setNewEvent({ ...newEvent, organization: e.target.value })}
                       className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                       placeholder="Temple or organization name"
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
                     <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      Event Date *
+                      Event Start Date *
                     </label>
                     <input
                       type="date"
                       value={newEvent.date}
-                      onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+                      onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
+                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
+                      <Calendar className="w-4 h-4" />
+                      Event End Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={newEvent.end_date}
+                      onChange={(e) => setNewEvent({ ...newEvent, end_date: e.target.value })}
                       className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                     />
                   </div>
@@ -741,7 +825,7 @@ const CalendarApp = () => {
                   <input
                     type="text"
                     value={newEvent.title}
-                    onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                    onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                     className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                     placeholder="Enter your sacred event title"
                   />
@@ -751,17 +835,29 @@ const CalendarApp = () => {
                   <div className="space-y-2">
                     <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      Time
+                      Start Time
                     </label>
                     <input
-                      type="text"
-                      value={newEvent.time}
-                      onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
-                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
-                      placeholder="e.g., 6:00 PM"
+                      type="time"
+                      value={newEvent.start_time}
+                      onChange={(e) => setNewEvent({ ...newEvent, start_time: e.target.value })}
+                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                     />
                   </div>
-                  
+
+                  <div className="space-y-2">
+                    <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      End Time
+                    </label>
+                    <input
+                      type="time"
+                      value={newEvent.end_time}
+                      onChange={(e) => setNewEvent({ ...newEvent, end_time: e.target.value })}
+                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
@@ -770,37 +866,81 @@ const CalendarApp = () => {
                     <input
                       type="text"
                       value={newEvent.location}
-                      onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                      onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                       className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                       placeholder="Temple or venue"
                     />
                   </div>
-                  
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
                   <div className="space-y-2">
-                    <label className="block text-yellow-100 font-semibold mb-2">Event Type</label>
-                    <select
-                      value={newEvent.type}
-                      onChange={(e) => setNewEvent({...newEvent, type: e.target.value})}
-                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
-                    >
-                      <option value="festival" className="bg-red-800">Festival/Religious</option>
-                      <option value="cultural" className="bg-red-800">Cultural Event</option>
-                      <option value="personal" className="bg-red-800">Personal Celebration</option>
-                      <option value="work" className="bg-red-800">Community Service</option>
-                      <option value="meeting" className="bg-red-800">Spiritual Gathering</option>
-                    </select>
+                    <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
+                      {/* <Link className="w-4 h-4" /> */}
+                      Website URL
+                    </label>
+                    <input
+                      type="url"
+                      value={newEvent.website_url}
+                      onChange={(e) => setNewEvent({ ...newEvent, website_url: e.target.value })}
+                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
+                      placeholder="https://example.com"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
+                      {/* <Link className="w-4 h-4" /> */}
+                      Registration Link
+                    </label>
+                    <input
+                      type="url"
+                      value={newEvent.registration_link}
+                      onChange={(e) => setNewEvent({ ...newEvent, registration_link: e.target.value })}
+                      className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
+                      placeholder="https://example.com/register"
+                    />
                   </div>
                 </div>
 
                 <div className="mb-6">
                   <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    External Links
+                  </label>
+                  <textarea
+                    value={newEvent.external_links}
+                    onChange={(e) => setNewEvent({ ...newEvent, external_links: e.target.value })}
+                    rows="2"
+                    className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30 resize-none"
+                    placeholder="Add any other relevant links, one per line."
+                  />
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-yellow-100 font-semibold mb-2">Event Type</label>
+                  <select
+                    value={newEvent.type}
+                    onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
+                    className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
+                  >
+                    <option value="festival" className="bg-red-800">Festival/Religious</option>
+                    <option value="cultural" className="bg-red-800">Cultural Event</option>
+                    <option value="personal" className="bg-red-800">Personal Celebration</option>
+                    <option value="work" className="bg-red-800">Community Service</option>
+                    <option value="meeting" className="bg-red-800">Spiritual Gathering</option>
+                  </select>
+                </div>
+
+                <div className="mb-6">
+                  <label className="block text-yellow-100 font-semibold mb-2 flex items-center gap-2">
                     <Image className="w-4 h-4" />
-                    Event Image URL (Optional)
+                    Event Image  (Optional)
                   </label>
                   <input
-                    type="url"
-                    value={newEvent.image}
-                    onChange={(e) => setNewEvent({...newEvent, image: e.target.value})}
+                    type="file"
+                    value={newEvent.featured_image}
+                    onChange={(e) => setNewEvent({ ...newEvent, featured_image: e.target.value })}
                     className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30"
                     placeholder="https://example.com/image.jpg"
                   />
@@ -813,11 +953,24 @@ const CalendarApp = () => {
                   </label>
                   <textarea
                     value={newEvent.description}
-                    onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                    onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                     rows="4"
                     className="w-full p-4 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-xl text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-300 hover:bg-red-900/30 resize-none"
                     placeholder="Describe your sacred event, its significance, and what participants can expect..."
                   />
+                </div>
+
+                <div className="mb-8 flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_all_day"
+                    checked={newEvent.is_all_day}
+                    onChange={(e) => setNewEvent({ ...newEvent, is_all_day: e.target.checked })}
+                    className="form-checkbox h-5 w-5 text-yellow-500 bg-red-900/20 border-yellow-300/30 rounded-md focus:ring-yellow-500"
+                  />
+                  <label htmlFor="is_all_day" className="text-yellow-100 font-semibold">
+                    All Day Event?
+                  </label>
                 </div>
 
                 <button
@@ -841,11 +994,11 @@ const CalendarApp = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-2xl font-bold text-yellow-100">
-                    {new Date(selectedDate).toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
+                    {new Date(selectedDate).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
                     })}
                   </h3>
                   <p className="text-yellow-100/70 text-sm mt-1">
@@ -853,12 +1006,12 @@ const CalendarApp = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button
+                  {/* <button
                     onClick={() => setShowCreateModal(true)}
                     className="p-3 bg-gradient-to-r from-yellow-500 to-red-600 text-white rounded-full hover:shadow-lg transition-all duration-200 hover:scale-110"
                   >
                     <Plus className="w-5 h-5" />
-                  </button>
+                  </button> */}
                   <button
                     onClick={() => setShowEventModal(false)}
                     className="p-3 hover:bg-red-900/20 rounded-full transition-colors duration-200"
@@ -868,7 +1021,7 @@ const CalendarApp = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="p-6 max-h-96 overflow-y-auto">
               {/* Show Hindu Calendar Events */}
               {(() => {
@@ -877,7 +1030,7 @@ const CalendarApp = () => {
                   new Date(selectedDate).getMonth(),
                   new Date(selectedDate).getDate()
                 );
-                
+
                 return (
                   <>
                     {hinduEvents.length > 0 && (
@@ -901,7 +1054,7 @@ const CalendarApp = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     {events[selectedDate]?.length > 0 && (
                       <div>
                         <h4 className="text-yellow-100 font-bold text-lg mb-3 flex items-center gap-2">
@@ -953,19 +1106,14 @@ const CalendarApp = () => {
                                     </div>
                                   )}
                                 </div>
-                                <button
-                                  onClick={() => deleteEvent(event.id)}
-                                  className="p-2 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors duration-200 hover:text-red-300"
-                                >
-                                  <X className="w-5 h-5" />
-                                </button>
+
                               </div>
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
-                    
+
                     {events[selectedDate]?.length === 0 && hinduEvents.length === 0 && (
                       <div className="text-center py-12">
                         <Calendar className="w-16 h-16 text-yellow-100/30 mx-auto mb-4" />
@@ -1001,46 +1149,46 @@ const CalendarApp = () => {
                 </button>
               </div>
             </div>
-            
+
             <div className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-yellow-100 mb-2">Event Title</label>
                 <input
                   type="text"
                   value={newEvent.title}
-                  onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                  onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                   className="w-full p-3 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-lg text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter event title..."
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-yellow-100 mb-2">Time</label>
                 <input
                   type="text"
                   value={newEvent.time}
-                  onChange={(e) => setNewEvent({...newEvent, time: e.target.value})}
+                  onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
                   className="w-full p-3 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-lg text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
                   placeholder="e.g., 6:00 PM"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-yellow-100 mb-2">Location</label>
                 <input
                   type="text"
                   value={newEvent.location}
-                  onChange={(e) => setNewEvent({...newEvent, location: e.target.value})}
+                  onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
                   className="w-full p-3 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-lg text-yellow-100 placeholder-yellow-200/50 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
                   placeholder="Enter location..."
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-yellow-100 mb-2">Type</label>
                 <select
                   value={newEvent.type}
-                  onChange={(e) => setNewEvent({...newEvent, type: e.target.value})}
+                  onChange={(e) => setNewEvent({ ...newEvent, type: e.target.value })}
                   className="w-full p-3 bg-red-900/20 backdrop-blur-md border border-yellow-300/30 rounded-lg text-yellow-100 focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
                 >
                   <option value="festival" className="bg-red-800">Festival/Religious</option>
@@ -1050,7 +1198,7 @@ const CalendarApp = () => {
                   <option value="meeting" className="bg-red-800">Spiritual Gathering</option>
                 </select>
               </div>
-              
+
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={() => setShowCreateModal(false)}
@@ -1082,7 +1230,7 @@ const CalendarApp = () => {
                 <span className="text-3xl font-bold text-yellow-100">🕉️ SpiritualEvents</span>
               </div>
               <p className="text-yellow-100/70 text-lg mb-6 max-w-md">
-                Sacred platform for Hindu spiritual events and community gatherings. 
+                Sacred platform for Hindu spiritual events and community gatherings.
                 Connect with divine traditions and celebrate our ancient heritage together.
               </p>
               <div className="flex space-x-4">
@@ -1100,7 +1248,7 @@ const CalendarApp = () => {
                 </a>
               </div>
             </div>
-            
+
             <div>
               <h4 className="text-yellow-100 font-bold text-lg mb-4">Sacred Links</h4>
               <ul className="space-y-3">
@@ -1111,7 +1259,7 @@ const CalendarApp = () => {
                 <li><a href="#" className="text-yellow-100/70 hover:text-yellow-100 transition-colors duration-200">Festival Guide</a></li>
               </ul>
             </div>
-            
+
             <div id="contact">
               <h4 className="text-yellow-100 font-bold text-lg mb-4">Sacred Contact</h4>
               <div className="space-y-3">
@@ -1130,7 +1278,7 @@ const CalendarApp = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="border-t border-yellow-300/20 mt-12 pt-8 text-center">
             <p className="text-yellow-100/60">
               © 2025 SpiritualEvents. All rights reserved. Made with 🕉️ for the divine community.
